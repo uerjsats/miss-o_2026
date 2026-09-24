@@ -2,14 +2,14 @@ import multiprocessing
 import os
 import time
 
-# ---------- Configuração ----------
+#Configuração
 LED = "/sys/class/leds/NOME_DO_LED"   # troque pelo nome que aparece em ls /sys/class/leds/
 STEP_TIME = 120                       # segundos em cada nível
 TEMP_LIMIT = 65                       # parada de segurança (°C)
 LEVELS = range[10,40,50,100]
 
 
-# ---------- Carga ----------
+#Carga
 def burn(level):
     # Trabalha 'level' por cento de cada período de 0,1 s e descansa o resto
     period = 0.1
@@ -56,7 +56,7 @@ def blink(times):
     time.sleep(1.5)   # pausa para separar um grupo de piscadas do próximo
 
 
-# ---------- Programa principal ----------
+#Programa principal
 if __name__ == "__main__":
     cores = os.cpu_count()
 
