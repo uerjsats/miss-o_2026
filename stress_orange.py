@@ -3,7 +3,7 @@ import os
 import time
 
 # Configuração
-LED = "/sys/class/leds/NOME_DO_LED"   # troque pelo nome que aparece em ls /sys/class/leds/
+LED = "/sys/class/leds/green_led"   # troque pelo nome que aparece em ls /sys/class/leds/
 STEP_TIME = 15                      # segundos em cada nível
 TEMP_LIMIT = 65                       # parada de segurança (°C)
 LEVELS = [10,40,50,100]
