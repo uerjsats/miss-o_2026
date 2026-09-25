@@ -2,11 +2,11 @@ import multiprocessing
 import os
 import time
 
-#Configuração
+# Configuração
 LED = "/sys/class/leds/NOME_DO_LED"   # troque pelo nome que aparece em ls /sys/class/leds/
-STEP_TIME = 120                       # segundos em cada nível
+STEP_TIME = 15                      # segundos em cada nível
 TEMP_LIMIT = 65                       # parada de segurança (°C)
-LEVELS = range[10,40,50,100]
+LEVELS = [10,40,50,100]
 
 
 #Carga
@@ -47,13 +47,15 @@ def led_write(file, value):
         f.write(value)
 
 
-def blink(times):
+def blink(times,deadline):
     for i in range(times):
+        if time.time()>= deadline:
+            return
         led_write("brightness", "1")
         time.sleep(0.25)
         led_write("brightness", "0")
         time.sleep(0.25)
-    time.sleep(1.5)   # pausa para separar um grupo de piscadas do próximo
+    time.sleep(max(0, min(1.5, deadline - time.time())))   # pausa para separar um grupo de piscadas do próximo
 
 
 #Programa principal
@@ -74,8 +76,9 @@ if __name__ == "__main__":
             processes = start_load(level, cores)
 
             step_start = time.time()
-            while time.time() - step_start < STEP_TIME:
-                blink(level // 10)
+            step_end = step_start + STEP_TIME
+            while time.time() < step_end:
+                blink(level // 10, step_end)
                 temp = read_temp()
                 elapsed = int(time.time() - step_start)
                 print(f"{level:3d}%  {elapsed:4d}s  temperatura: {temp:.1f}C")
@@ -85,6 +88,10 @@ if __name__ == "__main__":
                     break
 
             stop_load(processes)
+            for p in processes:
+                p.terminate()
+            for p in processes:
+                p.join()
             if too_hot:
                 break
 
